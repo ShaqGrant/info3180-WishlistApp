@@ -91,6 +91,11 @@ def about():
     """Render the website's about page."""
     return render_template('about.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('user',None)
+    return redirect('/')
+
 
 ###
 # The functions below should be applicable to all Flask apps.
