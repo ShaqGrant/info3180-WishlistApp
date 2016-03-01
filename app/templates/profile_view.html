@@ -1,13 +1,50 @@
 {% extends "base.html" %}
 
 
-{% block js %}
+{% block css %}
+<style type="text/css">
+  body{
+    padding-top: 40px;
+  }
+  
+  .content {
+    width: auto;
+    overflow: hidden;
+}
+.c1 {
+    overflow: hidden;
+}
+.content img {
+    margin-right: 15px;
+    float: left;
+}
+.cols {
+    background-color: #83ebfa;
+    border:2px solid black;
+    overflow:hidden;
+    width: 300px;
+    font-family: sans-serif;
+    font-size: 18px;
+}
+</style>
 {% endblock %}
 
 
 {% block main %}
-
-{{profile.first_name}}
-{{profile.last_name}}
-
+<div class="content">
+    <img src="{{ profile['image'] }}" width="250" height="250">
+    <div class="c1">
+        <h3 class=cols>{{profile.firstname}} {{profile.lastname}}</h3>
+        <br/>
+        <p class=cols>Today is: {{ curr_date }}</p>
+        <div class=cols>
+          <p>Username: {{profile.username}}</p>
+          <p>ID: {{profile.id}}</p>
+          <p>Sex: {{profile.sex}}</p>
+          <p>Age: {{profile.age}}</p>
+          <p>Highest Score: 568978</p>
+          <p>TDollars: 250000</p>
+        </div>
+    </div>
+</div>
 {% endblock %}
