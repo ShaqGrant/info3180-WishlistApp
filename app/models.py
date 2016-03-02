@@ -2,7 +2,7 @@ from . import db
 from datetime import datetime
 from random import getrandbits 
 
-class User_profile(db.Model):   
+class User(db.Model):   
     id = db.Column(db.Integer, primary_key=True)     
     first_name = db.Column(db.String(80))     
     last_name = db.Column(db.String(80)) 
@@ -16,15 +16,15 @@ class User_profile(db.Model):
     img_file = db.Column(db.String(400))
     
     
-    # def __init__(self, first_name, last_name, user_name, email, age, sex, img_file): 
-    #     self.first_name = first_name
-    #     self.last_name = last_name
-    #     self.user_name = user_name
-    #     self.email = email
-    #     self.age = age
-    #     self.sex = sex
-    #     self.img_file = img_file
-    #     self.date_added = datetime.now()
+    def __init__(self, first_name, last_name, user_name, email, age, sex, img_file): 
+        self.first_name = first_name
+        self.last_name = last_name
+        self.user_name = user_name
+        self.email = email
+        self.age = age
+        self.sex = sex
+        self.img_file = img_file
+        self.date_added = datetime.now()
 
     
     def generate_user_id(self):

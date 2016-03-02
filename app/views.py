@@ -7,18 +7,17 @@ This file creates your application.
 """
 
 from app import app
-from flask import render_template, request, redirect, url_for,jsonify,g,session, flash, json, os, response, time
+from flask import render_template, request, redirect, url_for,jsonify,g,session, flash, json
 from app import db
+import os, time
 
 from flask.ext.wtf import Form 
 from wtforms.fields import TextField # other fields include PasswordField 
 from wtforms.validators import Required, Email
-from app.models import User_profile
+from app.models import User
 from app.forms import LoginForm
 from werkzeug.utils import secure_filename
 from flask.ext.login import login_user, logout_user, current_user, login_required
-from app import app, db, lm, oid
-from app import oid, lm
 from datetime import datetime
 from random import getrandbits 
 
@@ -45,7 +44,7 @@ def login():
             if attempted_username == db_username.username and attempted_password == "password":
                 return redirect(url_for('profile_list'))
             else:
-                error = 'Invalid credentials'
+                error = 'Invalid username or password'
         return render_template("login.html",error=error,form=form)
     except Exception as e:
         flash(e)
@@ -66,12 +65,13 @@ def profile():
     if request.method == 'POST':
         first_name = request.form['first_name']
         last_name = request.form['last_name']
+        user_name = request.form['last_name']
         age = request.form['age']
         sex = request.form['sex']
         file = request.file['image']
         image = secure_filename(file.filename)
-        file.save(os.path.join("app/static", image))
-        user = User_profile(id, first_name=first_name, last_name=last_name, age=age, sex=sex, img_file=image)
+        file.save(os.path.join("app/static/uploads", image))
+        user = User(id, first_name=first_name, last_name=last_name, user_name=user_name, age=age, sex=sex, img_file=image)
        
         # write the information to the database
         # newprofile = User_profile(first_name=first_name,
@@ -79,7 +79,7 @@ def profile():
         db.session.add(user)
         db.session.commit()
         flash('New User Profile created')
-        return redirect(url_for('profile_view' , id=user.id))
+        return redirect(url_for('profile_list' , id=user.id))
     else:
         return render_template('profile_add.html',form=form)
 
@@ -90,26 +90,28 @@ def profile():
 
 @app.route('/profiles/',methods=["POST","GET"])
 def profile_list():
-    profiles = User_profile.query.all()
-    storage = []
-    if request.method == 'POST':
-      for users in profiles:
-        storage.append({'userid':users.id, 'firstname':users.first_name, 'lastname':users.last_name, 'sex':users.sex, 'age':users.age, 'image' :users.img_file})
-      users = {'users': storage}
-      return jsonify(users)
-    else:
-      return render_template('profiles.html',profiles=profiles)  
+    users = db.session.query(User).all()
+    userlist=[]
+    for user in users:
+        userlist.append({'username':user.username,'userid':user.userid})
+        if request.method == 'POST' and request.headers['Content-Type']== 'application/json':
+            return jsonify(users=userlist)
+        return render_template('profile_list.html', users=users)
 
 @app.route('/profile/<int:id>')
 def profile_view(id):
     timeinfo = time.strftime("%a, %b %d %Y")
-    profile = User_profile.query.filter_by(id=id).first()
-    image = url_for('static', filename='uploads/'+profile.image)
-    if request.method == 'POST':
-        return jsonify(id=profile.id,username=profile.username,image=image,sex=profile.sex, age=profile.age)
+    user = User.query.filter_by(id=id).first()
+    if not user:
+      flash("No such user")
     else:
-        profile_vars = {'id':profile.id, 'username':profile.username, 'image':image, 'age':profile.age, 'firstname':profile.firstname, 'lastname':profile.lastname, 'sex':profile.sex}
-    return render_template('profile_view.html',profile=profile_vars,curr_date=timeinfo)
+      image = '/static/uploads/' + user.image
+      if request.method == 'POST' and request.headers['Content-Type']== 'application/json':
+            return jsonify(userid=user.userid, image=image,username=user.username, sex=user.sex, age=user.age,profile_added_on=user.profile_added_on)
+      else:
+            user = {'id':user.userid,'image':image, 'user_name':user.user_name,'first_name':user.first_name, 'last_name':user.last_name,'age':user.age, 'sex':user.sex,'date_added':timeinfo(user.date_added)}
+            return render_template('profile_add.html', user=user)
+    return redirect(url_for("profiles"))
 
 
 @app.route('/about/')

@@ -6,23 +6,16 @@
 
 
 {% block main %}
+ <h2>Login</h2> 
   {% if error %}
     <p class=error><strong>Error:</strong> {{ error }} </p>
-  {% endif %}
-  
-<body>
-  <div class="container">
-    <br>
-    <h4>Please Login:</h4>
-    <br>
-    <form action="{{ url_for('login') }}" class="form-inline" method="post" name="login">
-      <div class="form-group">
-        <input type="text" class="form-control" placeholder="Username" name="username" value="{{request.form.username}}">
-        <input type="password" class="form-control" placeholder="Password" name="password" value="{{request.form.password}}">
-        <input class="btn btn-default" type="submit" value="Login">
-      </div>
-    </form>
-    <a href="{{url_for('newprofile')}}">Not yet registered?</a>
-  </div>
-</body>
+  {% endif %} 
+<form action="{{ url_for('login') }}" method=post> 
+<dl> 
+    <dt>Username: 
+    <dd><input type=text name=username> 
+    <dt>Password: 
+    <dd><input type=password name=password> 
+    <dd><input type=submit value=Login> 
+</dl> </form>
 {% endblock %}
