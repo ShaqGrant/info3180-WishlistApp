@@ -1,3 +1,5 @@
+This is Info3180-project1_2 (repository was misnamed as wishlistapp)
+==================================
 Flask App (User app)
 ==================================
 
